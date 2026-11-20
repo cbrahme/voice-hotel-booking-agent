@@ -1,0 +1,20 @@
+# Python 3.10+ (venv created with 3.11). Versions pinned 2026-11-20.
+
+# API server
+fastapi==0.165.0
+uvicorn[standard]==0.54.0
+pydantic==2.14.4
+python-dotenv==1.2.4
+
+# Database
+sqlalchemy==2.1.9
+
+# Agent
+langgraph==1.2.24
+langchain-openai==1.8.5
+
+# Testing
+pytest==9.2.0
+pytest-asyncio==1.5.0
+pytest-cov==7.1.0
+httpx==0.28.1

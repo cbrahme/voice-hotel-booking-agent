@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Voice Room Booking</title>
+  <meta name="description" content="Book a hotel room by talking to a voice assistant.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%231f5c5a'/><path d='M8 22V11h3v4h10v-4h3v11h-3v-4H11v4z' fill='%23f3e9d6'/></svg>">
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="22" height="22"><path d="M4 19V6h2.5v5h11V6H20v13h-2.5v-5.5h-11V19z" fill="currentColor"/></svg>
+      </div>
+      <div>
+        <h1>Room Booking Assistant</h1>
+        <p class="tagline">Book a room by talking, or by typing.</p>
+      </div>
+    </div>
+    <button id="new-conversation" class="btn ghost" type="button">New conversation</button>
+  </header>
+
+  <main class="layout">
+    <section class="panel conversation" aria-label="Conversation">
+      <div id="transcript" class="transcript" role="log" aria-live="polite"></div>
+
+      <div class="voice">
+        <button id="mic" class="mic" type="button" aria-pressed="false" aria-label="Start speaking">
+          <svg class="mic-icon" viewBox="0 0 24 24" width="30" height="30" aria-hidden="true">
+            <path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11z" fill="currentColor"/>
+          </svg>
+          <svg class="stop-icon" viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
+            <rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/>
+          </svg>
+        </button>
+        <div class="voice-text">
+          <p id="status" class="status">Tap the mic and start talking</p>
+          <p id="interim" class="interim" aria-live="polite"></p>
+        </div>
+      </div>
+
+      <form id="text-form" class="text-form" autocomplete="off">
+        <label class="sr-only" for="text-input">Type your message</label>
+        <input id="text-input" type="text" maxlength="1000" placeholder="Or type here…">
+        <button id="send" class="btn primary" type="submit">Send</button>
+      </form>
+
+      <div class="toggles">
+        <label><input type="checkbox" id="speak-toggle" checked> Speak replies</label>
+        <label title="Start listening automatically after each reply"><input type="checkbox" id="handsfree-toggle"> Hands-free</label>
+      </div>
+    </section>
+
+    <aside class="panel booking" aria-labelledby="booking-title">
+      <h2 id="booking-title">Your booking</h2>
+
+      <ol id="steps" class="steps">
+        <li data-step="dates">Dates</li>
+        <li data-step="guests">Guests</li>
+        <li data-step="room">Room</li>
+        <li data-step="contact">Details</li>
+        <li data-step="awaiting_confirmation">Confirm</li>
+        <li data-step="confirmed">Booked</li>
+      </ol>
+
+      <div id="confirmed-banner" class="banner" hidden>
+        <strong>Booked!</strong> Reference <span id="reference"></span>
+      </div>
+
+      <dl class="summary">
+        <div><dt>Dates</dt><dd data-field="dates">—</dd></div>
+        <div><dt>Nights</dt><dd data-field="nights">—</dd></div>
+        <div><dt>Guests</dt><dd data-field="guests">—</dd></div>
+        <div><dt>Room</dt><dd data-field="room">—</dd></div>
+        <div><dt>Name</dt><dd data-field="name">—</dd></div>
+        <div><dt>Phone</dt><dd data-field="phone">—</dd></div>
+        <div class="total"><dt>Total</dt><dd data-field="total">—</dd></div>
+      </dl>
+
+      <h2 class="rooms-title">Rooms</h2>
+      <ul id="rooms" class="rooms"></ul>
+      <p id="rooms-note" class="note">Prices are per night. Availability shows once you choose dates.</p>
+    </aside>
+  </main>
+</body>
+</html>

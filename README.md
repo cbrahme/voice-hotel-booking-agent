@@ -15,7 +15,7 @@ The hotel has three room types: Standard ($120/night, up to 2 guests), Deluxe ($
 
 ## Status
 
-🚧 **Work in progress.** Done so far: project setup and the database layer (rooms, availability, pricing and safe booking). Still to build: the conversation logic, the API and the voice web page.
+🚧 **Work in progress.** Done so far: project setup, the database layer (rooms, availability, pricing and safe booking) and the conversation logic (a full booking conversation works in Python). Still to build: the API and the voice web page.
 
 ## Getting started
 
@@ -26,7 +26,8 @@ python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env   # then add your OpenAI API key
-pytest                 # run the tests
+pytest                 # run the tests (offline)
+pytest -m live         # also test against the real OpenAI model (uses a few tokens)
 ```
 
 ## Tech stack

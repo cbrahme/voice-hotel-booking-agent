@@ -32,3 +32,36 @@ def session_factory(engine):
 def db(session_factory):
     with session_factory() as session:
         yield session
+
+
+class ScriptedExtractor:
+    """Stands in for the LLM: returns queued TurnExtractions in order and records
+    every call, so agent tests run offline and deterministically."""
+
+    def __init__(self):
+        self.queue = []
+        self.calls = []  # (message, ExtractionContext)
+
+    def push(self, *extractions):
+        self.queue.extend(extractions)
+
+    def extract(self, message, context):
+        self.calls.append((message, context))
+        if not self.queue:
+            raise AssertionError(f"no scripted extraction left for message {message!r}")
+        item = self.queue.pop(0)
+        if isinstance(item, Exception):
+            raise item
+        return item
+
+
+@pytest.fixture
+def extractor():
+    return ScriptedExtractor()
+
+
+@pytest.fixture
+def agent(extractor, session_factory):
+    from backend.app.agent.graph import BookingAgent
+
+    return BookingAgent(extractor, session_factory, today_fn=lambda: TODAY)

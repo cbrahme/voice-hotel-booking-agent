@@ -131,6 +131,11 @@ def max_room_capacity(db: Session) -> int:
     return db.scalar(select(func.max(Room.max_guests))) or 0
 
 
+def largest_room(db: Session) -> Room | None:
+    """The room type that fits the most guests."""
+    return db.scalar(select(Room).order_by(Room.max_guests.desc(), Room.base_price_per_night).limit(1))
+
+
 def quote_price(db: Session, room_type: str, check_in: date | str, check_out: date | str) -> float:
     """Total price = nights × base price per night, from the database."""
     room = get_room(db, room_type)

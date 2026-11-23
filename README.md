@@ -15,7 +15,7 @@ The hotel has three room types: Standard ($120/night, up to 2 guests), Deluxe ($
 
 ## Status
 
-🚧 **Work in progress.** Done so far: project setup, the database layer (rooms, availability, pricing and safe booking) and the conversation logic (a full booking conversation works in Python). Still to build: the API and the voice web page.
+🚧 **Work in progress.** Done so far: project setup, the database layer (rooms, availability, pricing and safe booking) the conversation logic and the API (a full booking conversation works over HTTP). Still to build: the voice web page.
 
 ## Getting started
 
@@ -28,7 +28,12 @@ pip install -r requirements.txt
 cp .env.example .env   # then add your OpenAI API key
 pytest                 # run the tests (offline)
 pytest -m live         # also test against the real OpenAI model (uses a few tokens)
+
+# start the server, then try: curl localhost:8000/api/inventory
+uvicorn backend.app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
+
+API docs are at http://localhost:8000/docs while the server is running.
 
 ## Tech stack
 

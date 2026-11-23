@@ -120,6 +120,11 @@ def check_availability(
     return [r for r in result if r.is_available] if only_available else result
 
 
+def list_rooms(db: Session) -> list[Room]:
+    """The room catalog, cheapest first."""
+    return list(db.scalars(select(Room).order_by(Room.base_price_per_night)).all())
+
+
 def get_room(db: Session, room_type: str) -> Room:
     room = db.scalar(select(Room).where(Room.room_type == room_type))
     if room is None:

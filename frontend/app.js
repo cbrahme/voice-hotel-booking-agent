@@ -266,9 +266,14 @@ function doneSpeaking(token) {
 
 // Chrome's own end-of-speech detection stops at the slightest pause, which cuts phone
 // numbers in half ("555… 123… 4567"). So we listen continuously and decide ourselves
-// when the user has finished: after this much silence (longer while collecting the
-// name and phone number). Tapping the mic sends immediately.
-const SILENCE_MS = { default: 1500, contact: 2500 };
+// when the user has finished. Tapping the mic sends immediately.
+//
+// Chrome marks words "final" a moment after the speaker pauses. We then wait a little
+// longer for more speech (much longer while collecting the name and phone number,
+// where people pause between digit groups). While words are still provisional we use
+// a fallback in case a "final" never arrives.
+const AFTER_FINAL_MS = { default: 800, contact: 2000 };
+const AFTER_INTERIM_MS = 2000;
 const MAX_LISTEN_MS = 30000;
 
 let recognition = null;
@@ -279,8 +284,9 @@ let silenceTimer = null;
 let maxListenTimer = null;
 let currentStep = "dates";
 
-function silenceDelay() {
-  return SILENCE_MS[currentStep] || SILENCE_MS.default;
+function silenceDelay(lastWasFinal) {
+  const afterFinal = AFTER_FINAL_MS[currentStep] || AFTER_FINAL_MS.default;
+  return lastWasFinal ? afterFinal : Math.max(afterFinal, AFTER_INTERIM_MS);
 }
 
 function clearListenTimers() {
@@ -334,8 +340,9 @@ function setupRecognition() {
     }
     ui.interim.textContent = joinSpeech(heard, pending);
     // Every new word restarts the silence countdown.
+    const lastWasFinal = ev.results[ev.results.length - 1].isFinal;
     clearTimeout(silenceTimer);
-    silenceTimer = setTimeout(() => recognition.stop(), silenceDelay());
+    silenceTimer = setTimeout(() => recognition.stop(), silenceDelay(lastWasFinal));
   };
 
   rec.onerror = (ev) => {

@@ -21,13 +21,14 @@ The assistant's last message: "{last_reply}"
 Rules:
 - Only fill a field if the guest stated it in THIS message. Never guess or copy known values.
 - Dates: resolve to YYYY-MM-DD using the calendar above. A weekday on its own, "this <weekday>" or
-  "next <weekday>" means the first such day after today. A day of month without a month means the
-  next one to come.
+  "next <weekday>" means the FIRST such day after today, even if it is later this week.
+  Example for today: {weekday_example}. A day of month without a month means the next one to come.
 - If the guest gives a length of stay ("3 nights", "a week"), set nights.
 - num_guests is the total number of people ("me and my wife" = 2, "just me" = 1).
 - room_type must be Standard, Deluxe or Suite. Use the assistant's last message to resolve
   references like "the cheaper one" or "that one".
-- phone_number: digits only (convert spoken numbers to digits); keep a leading + if a country code is said.
+- phone_number: exactly the digits the guest said, in order (convert spoken numbers to digits).
+  Never add a country code or any digit they didn't say. Use a leading + only if they said "plus".
 - intent: "provide" if any detail was given (even with a yes/no); otherwise "confirm" for yes/agreement,
   "deny" for no or a wish to change something, "off_topic" for greetings or unrelated talk,
   "unclear" if you can't tell what they mean.

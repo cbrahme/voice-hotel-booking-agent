@@ -39,7 +39,16 @@ def test_tc08_chat_response_shape(client, extractor):
     assert body["booking_summary"]["check_in_date"] == day(7).isoformat()
     assert body["booking_summary"]["nights"] == 2
     assert body["reply_text"].startswith("Got it: Friday, November 27th")
-    assert r.headers["Server-Timing"].startswith("total;dur=")
+    timing = dict(part.split(";dur=") for part in r.headers["Server-Timing"].split(", "))
+    assert set(timing) == {"llm", "total"} and float(timing["llm"]) <= float(timing["total"])
+
+
+def test_no_llm_timing_once_booked(client, extractor):
+    chat(client, extractor, check_in=day(7).isoformat(), nights=2, num_guests=2, room_type="Suite",
+         guest_name="Ada Lovelace", phone_number="5551234567")
+    chat(client, extractor, intent="confirm")
+    r = client.post("/api/chat", json={"session_id": "s1", "user_message": "thanks"})  # no LLM call
+    assert r.json()["is_complete"] and r.headers["Server-Timing"].startswith("total;dur=")
 
 
 def test_full_booking_over_http(client, extractor, session_factory):

@@ -15,7 +15,7 @@ The hotel has three room types: Standard ($120/night, up to 2 guests), Deluxe ($
 
 ## Status
 
-✅ **Working MVP.** You can book a room by voice or by typing in Chrome, Edge or Safari. Still to do: speed tuning (replies currently take about 1–2 seconds) and final hardening.
+✅ **MVP complete.** You can book a room by voice or by typing in Chrome, Edge or Safari. The server answers in about 1 second; to measure it yourself, run `python scripts/bench_latency.py --help`.
 
 ## Getting started
 

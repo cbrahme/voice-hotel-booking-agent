@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import logging
 import re
+import time
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import date, timedelta
@@ -265,7 +266,7 @@ def build_graph(
 
     def extract(state: BookingState) -> dict:
         if state.get("reservation_id"):
-            return {"extraction": None}  # booking finished: no need to call the LLM
+            return {"extraction": None, "llm_ms": None}  # booking finished: no need to call the LLM
         messages = state.get("messages") or []
         user_text = messages[-1].content if messages else ""
         last_reply = next((m.content for m in reversed(messages[:-1]) if isinstance(m, AIMessage)), P.GREETING)
@@ -275,11 +276,13 @@ def build_graph(
             known={k: state.get(k) for k in SLOTS},
             last_reply=last_reply,
         )
+        started = time.perf_counter()
         try:
-            return {"extraction": extractor.extract(user_text, context).model_dump()}
+            extraction = extractor.extract(user_text, context).model_dump()
         except Exception:
             log.exception("extraction failed")
-            return {"extraction": None}
+            extraction = None
+        return {"extraction": extraction, "llm_ms": (time.perf_counter() - started) * 1000}
 
     def understand(state: BookingState) -> dict:
         if state.get("reservation_id"):
@@ -407,6 +410,7 @@ class TurnResult:
     booking: dict[str, Any]
     is_complete: bool
     reservation_id: Optional[int]
+    llm_ms: Optional[float] = None
 
 
 def booking_summary(state: dict) -> dict[str, Any]:
@@ -441,6 +445,7 @@ class BookingAgent:
             booking=booking_summary(state),
             is_complete=state.get("reservation_id") is not None,
             reservation_id=state.get("reservation_id"),
+            llm_ms=state.get("llm_ms"),
         )
 
     def state(self, session_id: str) -> dict:

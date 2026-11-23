@@ -25,6 +25,7 @@ def test_prompt_contains_context():
     text = system.content
     assert "Today is 2026-11-23 (Monday)." in text
     assert "Fri 2026-11-27" in text
+    assert '"next Friday" = 2026-11-27 (not 2026-12-04)' in text
     assert "Current step: room" in text
     assert '{"check_in_date": "2026-11-27", "num_guests": 2}' in text  # unknown values left out
     assert "Say 'Deluxe' or 'Suite'" in text  # quotes can't break the prompt

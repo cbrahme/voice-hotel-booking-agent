@@ -156,8 +156,12 @@ def create_app(
         with state.locks.get(body.session_id):
             result = state.agent.chat(body.session_id, body.user_message)
         total_ms = (time.perf_counter() - started) * 1000
-        response.headers["Server-Timing"] = f"total;dur={total_ms:.0f}"
-        log.info("turn session=%s step=%s total_ms=%.0f", body.session_id, result.current_step, total_ms)
+        timing = [f"total;dur={total_ms:.0f}"]
+        if result.llm_ms is not None:
+            timing.insert(0, f"llm;dur={result.llm_ms:.0f}")
+        response.headers["Server-Timing"] = ", ".join(timing)
+        log.info("turn session=%s step=%s total_ms=%.0f llm_ms=%s", body.session_id, result.current_step,
+                 total_ms, f"{result.llm_ms:.0f}" if result.llm_ms is not None else "-")
         return ChatResponse(
             reply_text=result.reply,
             current_step=result.current_step,

@@ -30,6 +30,7 @@ class BookingState(TypedDict, total=False):
 
     # Per-turn scratch values (overwritten every turn)
     extraction: Optional[dict]
+    llm_ms: Optional[float]  # how long this turn's LLM call took (None if no call was made)
     route: str
     notices: list[str]  # short sentences to say before the next question
     last_changed_slots: list[str]

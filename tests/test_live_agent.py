@@ -3,6 +3,8 @@
 Excluded by default; run with `pytest -m live` (uses a small number of tokens).
 """
 
+from datetime import date
+
 import pytest
 
 from backend.app.agent.extractor import ExtractionContext, OpenAIExtractor
@@ -30,6 +32,22 @@ def test_relative_dates_and_guests(llm):
     assert ext.nights == 3 or ext.check_out == day(10).isoformat()
     assert ext.num_guests == 2
     assert ext.intent == "provide"
+
+
+@pytest.mark.parametrize(
+    "today,said,expected",
+    [
+        (date(2026, 11, 23), "next Friday", "2026-11-27"),  # Monday — this once came back as Wed Dec 2
+        (date(2026, 11, 23), "Saturday", "2026-11-28"),
+        (date(2026, 11, 25), "next Monday", "2026-11-30"),  # Wednesday, crosses a month
+        (date(2026, 11, 29), "Tuesday", "2026-12-01"),  # Sunday
+        (date(2026, 12, 28), "this Friday", "2027-01-01"),  # crosses a year
+    ],
+)
+def test_weekday_resolution(llm, today, said, expected):
+    context = ExtractionContext(today=today, step="dates", last_reply="When would you like to stay?")
+    ext = llm.extract(f"I'd like to check in {said} for two nights", context)
+    assert ext.check_in == expected
 
 
 def test_spoken_phone_and_name(llm):

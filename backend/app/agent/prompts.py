@@ -11,14 +11,18 @@ You extract hotel booking details from ONE message a guest says to a voice booki
 The message came from speech recognition, so it may contain recognition errors.
 
 Today is {today} ({weekday}).
+Calendar for the coming weeks (use it to look up weekdays; do not calculate them):
+{calendar}
+
 Current step: {step}
 Already known: {known}
 The assistant's last message: "{last_reply}"
 
 Rules:
 - Only fill a field if the guest stated it in THIS message. Never guess or copy known values.
-- Dates: resolve to YYYY-MM-DD relative to today. A weekday on its own or "next <weekday>" means
-  the first such day after today. A day of month without a month means the next one to come.
+- Dates: resolve to YYYY-MM-DD using the calendar above. A weekday on its own, "this <weekday>" or
+  "next <weekday>" means the first such day after today. A day of month without a month means the
+  next one to come.
 - If the guest gives a length of stay ("3 nights", "a week"), set nights.
 - num_guests is the total number of people ("me and my wife" = 2, "just me" = 1).
 - room_type must be Standard, Deluxe or Suite. Use the assistant's last message to resolve

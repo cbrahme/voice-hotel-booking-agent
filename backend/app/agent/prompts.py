@@ -62,6 +62,8 @@ ASK_NAME_AND_PHONE = "The {room} for {nights} comes to {price}. May I have your 
 ASK_NAME = "And what name should the booking be under?"
 ASK_PHONE = "Thanks, {first_name}. What's the best phone number to reach you?"
 BAD_PHONE = "That phone number doesn't look right."
+PHONE_TOO_SHORT = "I only caught {count} digits: {digits}. Please say the whole number, including the area code."
+PHONE_TOO_LONG = "That number has too many digits. Could you say it again?"
 BAD_NAME = "I didn't catch the name."
 
 READ_BACK = (

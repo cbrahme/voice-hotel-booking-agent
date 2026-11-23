@@ -205,9 +205,26 @@ def test_invalid_phone_is_not_stored(say):
     say(check_in=7, nights=2)
     say(num_guests=2)
     say(room_type="Deluxe")
-    r = say(guest_name="Ada Lovelace", phone_number="555 12")
+    r = say(guest_name="Ada Lovelace", phone_number="555 123")  # user paused mid-number
     assert r.current_step == "contact" and r.booking["phone_number"] is None
-    assert r.reply == f"{P.BAD_PHONE} Thanks, Ada. What's the best phone number to reach you?"
+    assert r.reply == (
+        "I only caught 6 digits: 5 5 5, 1 2 3. Please say the whole number, including the area code. "
+        "Thanks, Ada. What's the best phone number to reach you?"
+    )
+    r = say(phone_number="5551234567")
+    assert r.current_step == "awaiting_confirmation" and r.booking["phone_number"] == "5551234567"
+
+
+@pytest.mark.parametrize(
+    "raw,expected",
+    [("1234567890123456", P.PHONE_TOO_LONG), ("call me", P.BAD_PHONE)],
+)
+def test_other_phone_problems(say, raw, expected):
+    say(check_in=7, nights=2)
+    say(num_guests=2)
+    say(room_type="Deluxe")
+    r = say(guest_name="Ada Lovelace", phone_number=raw)
+    assert r.reply.startswith(expected)
 
 
 def test_tc13_room_taken_before_yes(say, session_factory):

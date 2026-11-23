@@ -15,7 +15,7 @@ The hotel has three room types: Standard ($120/night, up to 2 guests), Deluxe ($
 
 ## Status
 
-🚧 **Work in progress.** Done so far: project setup, the database layer (rooms, availability, pricing and safe booking) the conversation logic and the API (a full booking conversation works over HTTP). Still to build: the voice web page.
+✅ **Working MVP.** You can book a room by voice or by typing in Chrome, Edge or Safari. Still to do: speed tuning (replies currently take about 1–2 seconds) and final hardening.
 
 ## Getting started
 
@@ -29,11 +29,11 @@ cp .env.example .env   # then add your OpenAI API key
 pytest                 # run the tests (offline)
 pytest -m live         # also test against the real OpenAI model (uses a few tokens)
 
-# start the server, then try: curl localhost:8000/api/inventory
+# start the app
 uvicorn backend.app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
-API docs are at http://localhost:8000/docs while the server is running.
+Then open **http://localhost:8000** in Chrome, Edge or Safari, allow the microphone, tap the mic and start talking. You can also type. API docs are at http://localhost:8000/docs.
 
 ## Tech stack
 

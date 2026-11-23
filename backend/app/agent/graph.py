@@ -15,6 +15,7 @@ Each user message runs one pass through the graph:
 from __future__ import annotations
 
 import logging
+import re
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import date, timedelta
@@ -28,7 +29,7 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from .. import crud
 from ..utils.date_parser import parse_iso, speak_date, validate_check_in, validate_range
-from ..utils.validators import clean_name, normalize_phone, speak_phone
+from ..utils.validators import MAX_PHONE_DIGITS, MIN_PHONE_DIGITS, clean_name, normalize_phone, speak_phone
 from . import prompts as P
 from .extractor import ExtractionContext, Extractor
 from .state import BookingState, TurnExtraction
@@ -65,6 +66,16 @@ def step_for(state: dict) -> str:
 
 
 # --------------------------------------------------------------------------- merging
+
+
+def _phone_problem(raw: str) -> str:
+    """Say what was wrong with a phone number, reading back a partial one."""
+    digits = re.sub(r"\D", "", raw)
+    if 0 < len(digits) < MIN_PHONE_DIGITS:
+        return P.PHONE_TOO_SHORT.format(count=len(digits), digits=speak_phone(digits))
+    if len(digits) > MAX_PHONE_DIGITS:
+        return P.PHONE_TOO_LONG
+    return P.BAD_PHONE
 
 
 def merge_turn(
@@ -139,7 +150,7 @@ def merge_turn(
     if ext.phone_number is not None:
         phone = normalize_phone(ext.phone_number)
         if phone is None:
-            notices.append(P.BAD_PHONE)
+            notices.append(_phone_problem(ext.phone_number))
         elif phone != s["phone_number"]:
             s["phone_number"] = phone
             changed.append("phone")

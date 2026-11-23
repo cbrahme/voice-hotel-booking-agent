@@ -157,6 +157,16 @@ def test_startup_fails_clearly_without_api_key(monkeypatch, session_factory):
             pass
 
 
+def test_serves_the_real_frontend(agent, session_factory):
+    app = main.create_app(agent=agent, session_factory=session_factory)  # default frontend folder
+    with TestClient(app) as c:
+        page = c.get("/")
+        assert page.status_code == 200 and 'id="mic"' in page.text
+        for asset, kind in (("app.js", "javascript"), ("styles.css", "text/css")):
+            r = c.get(f"/{asset}")
+            assert r.status_code == 200 and kind in r.headers["content-type"]
+
+
 def test_serves_frontend_without_shadowing_api(agent, session_factory, tmp_path):
     (tmp_path / "index.html").write_text("<h1>voice booking</h1>")
     app = main.create_app(agent=agent, session_factory=session_factory, frontend_dir=tmp_path)
